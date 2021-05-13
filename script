@@ -1,0 +1,42 @@
+# please add cities according to your need, and if program stops due to an error kindly restart it. Thanks :)
+
+
+dist_dict = {'jhajjar': '189', 'gurgaon': '188', 'nuh': '205', 'palwal': '207', 'rewari': '202', 'rohtak': '192'}
+import time
+def check_vaccine_availability(city_name):
+    import urllib3
+    import json
+    from datetime import date
+    city_code = dist_dict.get(city_name, '189')
+    cowin_gurgaon_api = 'https://cdn-api.co-vin.in/api/v2/appointment/' \
+                        'sessions/calendarByDistrict?district_id='
+    today = date.today()
+    date = today.strftime("%d-%m-%Y")
+    today_vaccin_info_api = cowin_gurgaon_api + city_code + '&date=' + date
+    pool_manager = urllib3.PoolManager()
+    response = pool_manager.request('GET', today_vaccin_info_api)
+    if response.data:
+	    data = json.loads(response.data.decode('utf8'))
+	    centers = data.get('centers')
+	    available_centers = []
+	    if centers:
+	        for center in centers:
+	            center_name = center.get('name', "none")
+	            sessions = center.get('sessions', [])
+	            for session in sessions:
+	                if session.get('available_capacity', 0) > 0:
+	                    center_dict = {
+	                        "Name": city_name,
+	                        "center name": center_name,
+	                        "positions": session.get('available_capacity', 0)
+	                    }
+	                    available_centers.append(center_dict)
+    print(available_centers)
+while True:
+    check_vaccine_availability('jhajjar')
+    check_vaccine_availability('gurgaon')
+    check_vaccine_availability('rewari')
+    check_vaccine_availability('palwal')
+    check_vaccine_availability('rohtak')
+    check_vaccine_availability('nuh')
+    time.sleep(1.5)
