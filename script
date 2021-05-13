@@ -18,6 +18,7 @@ def check_vaccine_availability(city_name):
     response = pool_manager.request('GET', today_vaccin_info_api)
     if response.data:
 	    data = json.loads(response.data.decode('utf8'))
+        print('hello')
 	    centers = data.get('centers')
 	    available_centers = []
 	    if centers:
@@ -25,19 +26,21 @@ def check_vaccine_availability(city_name):
 	            center_name = center.get('name', "none")
 	            sessions = center.get('sessions', [])
 	            for session in sessions:
-	                if session.get('available_capacity', 0) > 0:
+	                if session.get('available_capacity', 0) > 0 and session.get('min_age_limit', 45) < 45:
 	                    center_dict = {
-	                        "Name": city_name,
-	                        "center name": center_name,
-	                        "positions": session.get('available_capacity', 0)
+	                        "City": city_name,
+	                        "Center name": center_name,
+	                        "Seats": session.get('available_capacity', 0)
 	                    }
 	                    available_centers.append(center_dict)
     print(available_centers)
 while True:
+    print('Vaccine Availability')
     check_vaccine_availability('jhajjar')
     check_vaccine_availability('gurgaon')
     check_vaccine_availability('rewari')
     check_vaccine_availability('palwal')
     check_vaccine_availability('rohtak')
     check_vaccine_availability('nuh')
-    time.sleep(1.5)
+    print('------------------------------------------')
+    time.sleep(1.5)    
